@@ -1,0 +1,22 @@
+{
+  "author": "kookxiang",
+  "dependencies": {
+    "yaml": "^1.10.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^15.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@tsconfig/node12": "^1.0.7",
+    "@types/node": "^12.19.0",
+    "rollup": "^2.32.1",
+    "rollup-plugin-typescript2": "^0.28.0",
+    "typescript": "^4.0.3"
+  },
+  "license": "ISC",
+  "name": "clash-converter",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -cw"
+  },
+  "version": "1.0.0"
+}

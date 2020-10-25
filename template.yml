@@ -1,0 +1,19 @@
+ROSTemplateFormatVersion: "2015-09-01"
+Transform: "Aliyun::Serverless-2018-04-03"
+Resources:
+  utils:
+    Type: "Aliyun::Serverless::Service"
+    Properties:
+      Role: 'acs:ram::1221838831564122:role/aliyunfclogexecutionrole'
+      LogConfig:
+        Project: aliyun-fc-cn-shenzhen-da289e20-f41c-5fc8-8a14-cc595f2f25f4
+        Logstore: function-log
+      InternetAccess: true
+    clash-converter:
+      Type: "Aliyun::Serverless::Function"
+      Properties:
+        Handler: index.handler
+        Runtime: nodejs12
+        Timeout: 30
+        InstanceConcurrency: 100
+        CodeUri: "./build"

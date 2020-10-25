@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "declaration": false,
+        "module": "esnext",
+        "moduleResolution": "node"
+    },
+    "extends": "@tsconfig/node12/tsconfig.json"
+}
