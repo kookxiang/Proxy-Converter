@@ -6,7 +6,7 @@ export default function GetProxyListFromBase64(content: string): any[] {
         throw new Error('cannot find proxy list.')
     }
     return data.filter(Boolean).map((line: string) => {
-        const url = new URL(line)
+        const url = new URL(line.trim())
         const protocol = url.protocol.replace(/:$/, '')
         if (protocol === 'vmess') {
             return GetProxyFromVmessURL(url)
