@@ -1,32 +1,41 @@
+import { URL } from "url"
+
 export default function GetProxyListFromBase64(content: string): any[] {
-  const realContent = Buffer.from(content, 'base64').toString()
-  const proxies = realContent
-    .replace(/\r/g, '')
-    .split('\n')
-    .filter(v => !!v)
-    .map(v => {
-    switch (true) {
-      case v.startsWith('vmess://'):
-        const proxy = JSON.parse(Buffer.from(v.slice(8), 'base64').toString())
-        return {
-          name: proxy.ps,
-          type: 'vmess',
-          server: proxy.add,
-          port: proxy.port,
-          uuid: proxy.id,
-          alterId: proxy.aid,
-          udp: true,
-          cipher: 'auto',
-          network: proxy.net,
-          'ws-path': proxy.path,
-          'ws-headers': {
-            Host: proxy.host
-          },
-        }
-    
-      default:
-        throw new Error("Unsupported proxy type.")
+    const data = Buffer.from(content, 'base64').toString().split('\n')
+    if (!data?.length) {
+        throw new Error('cannot find proxy list.')
     }
-  })
-  return proxies
+    return data.map((line: string) => {
+        const url = new URL(line)
+        const protocol = url.protocol.replace(/:$/, '')
+        if (protocol === 'vmess') {
+            return GetProxyFromVmessURL(url)
+        } else {
+            throw new Error(`unsupported protocol: ${protocol}`)
+        }
+    })
+}
+
+function GetProxyFromVmessURL(url: URL): any {
+    const config = JSON.parse(Buffer.from(url.host, 'base64').toString())
+    if (+config.v !== 2) {
+        throw new Error(`unsupported vmess version: ${config.v}`)
+    }
+    const result: any = {
+        name: config.ps,
+        type: 'vmess',
+        server: config.add,
+        port: config.port,
+        uuid: config.id,
+        alterId: config.aid,
+        cipher: config.type,
+        udp: true,
+        tls: config.tls,
+        network: config.net,
+        'ws-path': config.path,
+    }
+    if (config.net === 'ws' && config.host) {
+        result['ws-headers'] = { Host: config.host }
+    }
+    return result
 }
