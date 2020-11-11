@@ -31,10 +31,12 @@ function GetProxyFromVmessURL(url: URL): any {
         cipher: config.type,
         udp: true,
         network: config.net,
-        'ws-path': config.path,
     }
     if (config.tls) {
         result.tls = true
+    }
+    if (config.net === 'ws' && config['ws-path']) {
+        result['ws-path'] = config['ws-path']
     }
     if (config.net === 'ws' && config.host) {
         result['ws-headers'] = { Host: config.host }
