@@ -1,7 +1,8 @@
 import https from 'https'
 import YAML from 'yaml'
-
+import GetProxyListFromBase64 from './Extractor/Base64'
 import GetProxyListFromYaml from './Extractor/Yaml'
+
 
 async function FetchSubscription(url: string, timeout = 3000): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -58,6 +59,9 @@ export async function handler(request: any, response: any) {
         switch (type) {
             case 'yaml':
                 proxies = GetProxyListFromYaml(data)
+                break
+            case 'base64':
+                proxies = GetProxyListFromBase64(data)
                 break
             default:
                 response.setStatusCode(500)
