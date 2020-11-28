@@ -1,12 +1,12 @@
 import YAML from 'yaml'
 import { ProxyServer, ShadowsocksProxyServer, VmessProxyServer } from "../ProxyServer"
 
-const YamlKeys = ['proxies', 'Proxies', 'proxy', 'Proxy']
+const PossibleKeys = ['proxies', 'Proxies', 'proxy', 'Proxy']
 
-export default function GetProxyListFromYaml(content: string): ProxyServer[] {
+export default function GetProxyListFromClash(content: string): ProxyServer[] {
     const data = YAML.parse(content)
     let dataList = []
-    for (const key of YamlKeys) {
+    for (const key of PossibleKeys) {
         if (Array.isArray(data[key])) {
             dataList = data[key]
             break;

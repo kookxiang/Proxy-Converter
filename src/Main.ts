@@ -1,6 +1,6 @@
 import https from 'https'
 import GetProxyListFromBase64 from './Extractor/Base64'
-import GetProxyListFromYaml from './Extractor/Yaml'
+import GetProxyListFromClash from './Extractor/Clash'
 import FormatProxyForClash from './Formatter/Clash'
 import FormatProxyForSurge from './Formatter/Surge'
 import { ProxyServer } from './ProxyServer'
@@ -27,7 +27,7 @@ function asArray<T>(source: T | T[]) : T[] {
 }
 
 export async function handler(request: any, response: any) {
-    const { debug, filter, exempt, url, from = 'yaml', to = 'clash' } = request.queries
+    const { debug, filter, exempt, url, from = 'clash', to = 'clash' } = request.queries
 
     response.setHeader('Content-Type', 'text/plain; charset=utf-8')
 
@@ -60,7 +60,8 @@ export async function handler(request: any, response: any) {
         let proxies: ProxyServer[];
         switch (from) {
             case 'yaml':
-                proxies = GetProxyListFromYaml(data)
+            case 'clash':
+                proxies = GetProxyListFromClash(data)
                 break
             case 'base64':
                 proxies = GetProxyListFromBase64(data)
