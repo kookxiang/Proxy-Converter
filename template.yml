@@ -9,7 +9,7 @@ Resources:
         Project: aliyun-fc-cn-shenzhen-da289e20-f41c-5fc8-8a14-cc595f2f25f4
         Logstore: function-log
       InternetAccess: true
-    clash-converter:
+    proxy-converter:
       Type: "Aliyun::Serverless::Function"
       Properties:
         Handler: index.handler

@@ -1,13 +1,53 @@
 import YAML from 'yaml'
+import { ProxyServer, ShadowsocksProxyServer, VmessProxyServer } from "../ProxyServer"
 
 const YamlKeys = ['proxies', 'Proxies', 'proxy', 'Proxy']
 
-export default function GetProxyListFromYaml(content: string): any[] {
+export default function GetProxyListFromYaml(content: string): ProxyServer[] {
     const data = YAML.parse(content)
+    let dataList = []
     for (const key of YamlKeys) {
         if (Array.isArray(data[key])) {
-            return data[key]
+            dataList = data[key]
+            break;
         }
     }
-    throw new Error('cannot find proxy list.')
+    if (!dataList.length) {
+        throw new Error('cannot find proxy list.')
+    }
+    return dataList.map((config: any) => {
+        if (config.type === 'vmess') {
+            const proxy: VmessProxyServer = {
+                Cipher: config.cipher || 'auto',
+                ClientAlterID: config.alterId || 0,
+                ClientID: config.uuid,
+                Name: config.name,
+                ServerAddress: config.server,
+                ServerPort: config.port,
+                SupportUDP: config.udp,
+                Transport: config.network || 'tcp',
+                TransportSecurity: config.tls ? 'tls' : 'none',
+                Type: 'vmess',
+            }
+            if (proxy.Transport === 'ws' && config['ws-path']) {
+                proxy.WebSocketPath = config['ws-path']
+            }
+            if (proxy.Transport === 'ws' && config['ws-headers']) {
+                proxy.WebSocketHost = config['ws-headers']?.Host ?? config['ws-headers']?.host
+            }
+            return proxy;
+        } else if (config.type === 'ss') {
+            const proxy: ShadowsocksProxyServer = {
+                Cipher: config.cipher,
+                Name: config.name,
+                Password: config.password,
+                ServerAddress: config.server,
+                ServerPort: config.port,
+                Type: 'ss',
+            };
+            return proxy;
+        } else {
+            throw new Error(`unknown type: ${config.type}`)
+        }
+    })
 }
