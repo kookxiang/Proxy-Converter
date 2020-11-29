@@ -37,7 +37,7 @@ export async function handler(request: any, response: any) {
         return
     }
 
-    let data;
+    let data
 
     try {
         if (debug) {
@@ -50,14 +50,14 @@ export async function handler(request: any, response: any) {
         response.setStatusCode(500)
         response.send(e.message)
         console.timeEnd('fetch subscription')
-        return;
+        return
     }
 
     console.timeEnd('fetch subscription')
 
     try {
         // import proxy from subscription
-        let proxies: ProxyServer[];
+        let proxies: ProxyServer[]
         switch (from) {
             case 'yaml':
             case 'clash':

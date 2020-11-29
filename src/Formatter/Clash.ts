@@ -2,9 +2,9 @@ import YAML from 'yaml'
 import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from '../ProxyServer'
 
 export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
-    const proxies: any[] = [];
+    const proxies: any[] = []
     for (let rawProxy of ProxyList) {
-        const config: any = {};
+        const config: any = {}
         if (rawProxy.Type === 'vmess') {
             let proxy = rawProxy as VmessProxyServer
             config.name = proxy.Name
@@ -57,7 +57,7 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
         } else {
             throw new Error(`unknown type: ${rawProxy.Type}`)
         }
-        proxies.push(config);
+        proxies.push(config)
     }
     return YAML.stringify({ proxies })
 }

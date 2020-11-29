@@ -1,5 +1,5 @@
-import { URL } from "url"
-import { ProxyServer, ShadowsocksProxyServer, VmessProxyServer } from "../ProxyServer"
+import { URL, URLSearchParams } from "url"
+import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from "../ProxyServer"
 
 export default function GetProxyListFromBase64(content: string): ProxyServer[] {
     const data = Buffer.from(content, 'base64').toString().split('\n')
@@ -13,6 +13,8 @@ export default function GetProxyListFromBase64(content: string): ProxyServer[] {
             return GetProxyFromVmessURL(url)
         } else if (protocol === 'ss') {
             return GetProxyFromShadowsocksURL(url)
+        } else if (protocol === 'ssr') {
+            return GetProxyFromShadowsocksRURL(url)
         } else {
             throw new Error(`unsupported protocol: ${protocol}`)
         }
@@ -57,7 +59,11 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
         }
         return result
     } else {
-        const raw = new URL('ss://' + Buffer.from(url.host, 'base64').toString())
+        const decoded = Buffer.from(url.host, 'base64').toString()
+        if (decoded.match(/:/g)?.length === 5) {
+            return GetProxyFromShadowsocksRURL(url)
+        }
+        const raw = new URL(`ss://${decoded}`)
         const result: ShadowsocksProxyServer = {
             Cipher: raw.username,
             Name: url.hash?.replace(/^#/, '') || raw.host,
@@ -68,4 +74,28 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
         }
         return result
     }
+}
+
+function GetProxyFromShadowsocksRURL(url: URL): ShadowsocksRProxyServer {
+    const decoded = Buffer.from(url.host, 'base64').toString()
+    const [prefix, suffix] = decoded.split('/')
+    const [host, port, protocol, method, obfs, password] = prefix.split(':')
+    const params = new URLSearchParams(suffix)
+    const result: ShadowsocksRProxyServer = {
+        Cipher: method,
+        Name: params.get('remarks') ?? `${host}:${port}`,
+        Obfs: obfs,
+        Password: Buffer.from(password, 'base64').toString(),
+        Protocol: protocol,
+        ServerAddress: host,
+        ServerPort: +port,
+        Type: 'ssr',
+    }
+    if (params.has('obfsparam')) {
+        result.ObfsParams = params.get('obfsparam') as string
+    }
+    if (params.has('protoparam')) {
+        result.ProtocolParams = params.get('protoparam') as string
+    }
+    return result
 }

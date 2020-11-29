@@ -9,7 +9,7 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
     for (const key of PossibleKeys) {
         if (Array.isArray(data[key])) {
             dataList = data[key]
-            break;
+            break
         }
     }
     if (!dataList.length) {
@@ -35,7 +35,7 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
             if (proxy.Transport === 'ws' && config['ws-headers']) {
                 proxy.WebSocketHost = config['ws-headers']?.Host ?? config['ws-headers']?.host
             }
-            return proxy;
+            return proxy
         } else if (config.type === 'ss') {
             const proxy: ShadowsocksProxyServer = {
                 Cipher: config.cipher,
@@ -44,8 +44,8 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
                 ServerAddress: config.server,
                 ServerPort: config.port,
                 Type: 'ss',
-            };
-            return proxy;
+            }
+            return proxy
         } else if (config.type === 'ssr') {
             const proxy: ShadowsocksRProxyServer = {
                 Cipher: config.cipher,
@@ -59,8 +59,8 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
                 ServerPort: config.port,
                 SupportUDP: config.udp,
                 Type: 'ssr',
-            };
-            return proxy;
+            }
+            return proxy
         } else {
             throw new Error(`unknown type: ${config.type}`)
         }
