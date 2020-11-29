@@ -1,5 +1,5 @@
 import YAML from 'yaml'
-import { ProxyServer, ShadowsocksProxyServer, VmessProxyServer } from "../ProxyServer"
+import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from "../ProxyServer"
 
 const PossibleKeys = ['proxies', 'Proxies', 'proxy', 'Proxy']
 
@@ -44,6 +44,21 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
                 ServerAddress: config.server,
                 ServerPort: config.port,
                 Type: 'ss',
+            };
+            return proxy;
+        } else if (config.type === 'ssr') {
+            const proxy: ShadowsocksRProxyServer = {
+                Cipher: config.cipher,
+                Name: config.name,
+                Obfs: config.obfs,
+                ObfsParams: config['obfs-param'],
+                Password: config.password,
+                Protocol: config.protocol,
+                ProtocolParams: config['protocol-param'],
+                ServerAddress: config.server,
+                ServerPort: config.port,
+                SupportUDP: config.udp,
+                Type: 'ssr',
             };
             return proxy;
         } else {

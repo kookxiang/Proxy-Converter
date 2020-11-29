@@ -1,12 +1,12 @@
 import YAML from 'yaml'
-import { ProxyServer, ShadowsocksProxyServer, VmessProxyServer } from '../ProxyServer'
+import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from '../ProxyServer'
 
 export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
     const proxies: any[] = [];
-    for (let proxy of ProxyList) {
+    for (let rawProxy of ProxyList) {
         const config: any = {};
-        if (proxy.Type === 'vmess') {
-            proxy = proxy as VmessProxyServer
+        if (rawProxy.Type === 'vmess') {
+            let proxy = rawProxy as VmessProxyServer
             config.name = proxy.Name
             config.type = 'vmess'
             config.server = proxy.ServerAddress
@@ -28,8 +28,8 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
             if (proxy.Transport === 'ws' && proxy.WebSocketHost) {
                 config['ws-headers'] = { Host: proxy.WebSocketHost }
             }
-        } else if (proxy.Type === 'ss') {
-            proxy = proxy as ShadowsocksProxyServer
+        } else if (rawProxy.Type === 'ss') {
+            let proxy = rawProxy as ShadowsocksProxyServer
             config.name = proxy.Name
             config.type = 'ss'
             config.server = proxy.ServerAddress
@@ -37,8 +37,25 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
             config.cipher = proxy.Cipher
             config.password = proxy.Password
             config.udp = proxy.SupportUDP
+        } else if (rawProxy.Type === 'ssr') {
+            let proxy = rawProxy as ShadowsocksRProxyServer
+            config.cipher = proxy.Cipher
+            config.name = proxy.Name
+            config.obfs = proxy.Obfs
+            if (proxy.ObfsParams) {
+                config['obfs-param'] = proxy.ObfsParams
+            }
+            config.password = proxy.Password
+            config.port = proxy.ServerPort
+            config.protocol = proxy.Protocol
+            if (proxy.ProtocolParams) {
+                config['protocol-param'] = proxy.ProtocolParams
+            }
+            config.server = proxy.ServerAddress
+            config.type = 'ssr'
+            config.udp = proxy.SupportUDP
         } else {
-            throw new Error(`unknown type: ${proxy.Type}`)
+            throw new Error(`unknown type: ${rawProxy.Type}`)
         }
         proxies.push(config);
     }
