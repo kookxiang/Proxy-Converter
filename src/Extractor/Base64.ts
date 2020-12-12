@@ -1,3 +1,4 @@
+import { unescape } from "querystring"
 import { URL, URLSearchParams } from "url"
 import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from "../ProxyServer"
 
@@ -51,7 +52,7 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
     if (url.username && url.password) {
         const result: ShadowsocksProxyServer = {
             Cipher: url.username,
-            Name: url.hash?.replace(/^#/, '') || url.host,
+            Name: unescape(url.hash?.replace(/^#/, '')) || url.host,
             Password: url.password,
             ServerAddress: url.hostname,
             ServerPort: +url.port,
@@ -69,7 +70,7 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
         const raw = new URL(`ss://${decoded}`)
         const result: ShadowsocksProxyServer = {
             Cipher: raw.username,
-            Name: url.hash?.replace(/^#/, '') || raw.host,
+            Name: unescape(url.hash?.replace(/^#/, '')) || url.host,
             Password: raw.password,
             ServerAddress: raw.hostname,
             ServerPort: +raw.port,
