@@ -58,6 +58,9 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
             Type: 'ss',
         }
         return result
+    } if (url.username) {
+        [url.username, url.password] = Buffer.from(url.username, 'base64').toString().split(':')
+        return GetProxyFromShadowsocksURL(url)
     } else {
         const decoded = Buffer.from(url.host, 'base64').toString()
         if (decoded.match(/:/g)?.length === 5) {
