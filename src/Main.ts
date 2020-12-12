@@ -1,3 +1,4 @@
+import util from 'util'
 import https from 'https'
 import GetProxyListFromBase64 from './Extractor/Base64'
 import GetProxyListFromClash from './Extractor/Clash'
@@ -98,6 +99,6 @@ export async function handler(request: any, response: any) {
     } catch (e) {
         console.error(e)
         response.setStatusCode(500)
-        response.send(e.message)
+        response.send(util.inspect(e))
     }
 }
