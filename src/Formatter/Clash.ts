@@ -11,6 +11,7 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
             config.type = 'vmess'
             config.server = proxy.ServerAddress
             config.port = proxy.ServerPort
+            config.cipher = proxy.Cipher
             config.uuid = proxy.ClientID
             config.alterId = proxy.ClientAlterID
             if (proxy.SupportUDP) {
