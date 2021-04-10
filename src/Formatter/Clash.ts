@@ -1,5 +1,5 @@
 import YAML from 'yaml'
-import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from '../ProxyServer'
+import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from '../ProxyServer'
 
 export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
     const proxies: any[] = []
@@ -55,6 +55,22 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
             config.server = proxy.ServerAddress
             config.type = 'ssr'
             config.udp = proxy.SupportUDP
+        } else if (rawProxy.Type === 'trojan') {
+            let proxy = rawProxy as TrojanProxyServer
+            config.name = proxy.Name
+            config.password = proxy.Password
+            config.port = proxy.ServerPort
+            config.server = proxy.ServerAddress
+            config.type = 'trojan'
+            if (proxy.SupportUDP) {
+                config.udp = proxy.SupportUDP
+            }
+            if (proxy.ServerName) {
+                config.sni = proxy.ServerName
+            }
+            if (proxy.AllowInsecure) {
+                config['skip-cert-verify'] = proxy.SupportUDP
+            }
         } else {
             throw new Error(`unknown type: ${rawProxy.Type}`)
         }

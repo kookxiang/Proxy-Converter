@@ -1,6 +1,6 @@
 interface CommonConfig {
     Name: string,
-    Type: 'vmess' | 'ss' | 'ssr',
+    Type: 'vmess' | 'ss' | 'ssr' | 'trojan',
 }
 
 export interface VmessProxyServer extends CommonConfig {
@@ -40,4 +40,13 @@ export interface ShadowsocksRProxyServer extends ShadowsocksProxyServer {
     ObfsParams?: string,
 }
 
-export type ProxyServer = VmessProxyServer | ShadowsocksProxyServer | ShadowsocksRProxyServer
+export interface TrojanProxyServer extends CommonConfig {
+    AllowInsecure?: boolean;
+    Password: string,
+    ServerAddress: string,
+    ServerName?: string,
+    ServerPort: number,
+    SupportUDP?: boolean,
+}
+
+export type ProxyServer = VmessProxyServer | ShadowsocksProxyServer | ShadowsocksRProxyServer | TrojanProxyServer

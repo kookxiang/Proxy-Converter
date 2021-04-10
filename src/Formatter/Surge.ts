@@ -1,4 +1,4 @@
-import { ProxyServer, ShadowsocksProxyServer, VmessProxyServer } from '../ProxyServer'
+import { ProxyServer, ShadowsocksProxyServer, TrojanProxyServer, VmessProxyServer } from '../ProxyServer'
 
 export default function FormatProxyForSurge(ProxyList: ProxyServer[]): string {
     let result: string[] = []
@@ -35,6 +35,15 @@ export default function FormatProxyForSurge(ProxyList: ProxyServer[]): string {
             row.push(`${proxy.ServerPort}`)
             row.push(`encrypt-method=${proxy.Cipher}`)
             row.push(`password=${proxy.Password}`)
+        } else if (proxy.Type === 'trojan') {
+            proxy = proxy as TrojanProxyServer
+            row.push(`${proxy.Name} = trojan`)
+            row.push(proxy.ServerAddress)
+            row.push(`${proxy.ServerPort}`)
+            row.push(`password=${proxy.Password}`)
+            if (proxy.ServerName) {
+                row.push(`sni=${proxy.ServerName}`)
+            }
         } else {
             throw new Error(`unknown type: ${proxy.Type}`)
         }

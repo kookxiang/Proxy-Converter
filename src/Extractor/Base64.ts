@@ -1,5 +1,5 @@
-import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from "../ProxyServer"
 import { decode } from 'js-base64';
+import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from "../ProxyServer";
 
 export default function GetProxyListFromBase64(content: string): ProxyServer[] {
     const data = decode(content).split('\n')
@@ -16,6 +16,8 @@ export default function GetProxyListFromBase64(content: string): ProxyServer[] {
             return GetProxyFromShadowsocksURL(url)
         } else if (protocol === 'ssr') {
             return GetProxyFromShadowsocksRURL(url)
+        } else if (protocol === 'trojan') {
+            return GetProxyFromTrojanURL(url)
         } else {
             throw new Error(`unsupported protocol: ${protocol}`)
         }
@@ -101,4 +103,14 @@ function GetProxyFromShadowsocksRURL(url: URL): ShadowsocksRProxyServer {
         result.ProtocolParams = params.get('protoparam') as string
     }
     return result
+}
+
+function GetProxyFromTrojanURL(url: URL): TrojanProxyServer {
+    return {
+        Name: url.hash || `${url.host}:${url.port}`,
+        Password: url.username,
+        ServerAddress: url.host,
+        ServerPort: Number(url.port),
+        Type: 'trojan',
+    };
 }

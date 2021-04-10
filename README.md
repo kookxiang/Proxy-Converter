@@ -41,9 +41,3 @@ https://clash-converter.kookxiang.workers.dev/?url=https%3A%2F%2Fexample.com%2Fc
 ```
 ...&filter=HK&filter=TW
 ```
-
-### debug
-
-没卵用的 debug 模式
-
-目前唯一的功能是将订阅地址信息记录到日志中方便排查（默认不会记录）

@@ -1,5 +1,5 @@
 import YAML from 'yaml'
-import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from "../ProxyServer"
+import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from "../ProxyServer"
 
 const PossibleKeys = ['proxies', 'Proxies', 'proxy', 'Proxy']
 
@@ -59,6 +59,18 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
                 ServerPort: config.port,
                 SupportUDP: config.udp,
                 Type: 'ssr',
+            }
+            return proxy
+        } else if (config.type === 'trojan') {
+            const proxy: TrojanProxyServer = {
+                AllowInsecure: config['skip-cert-verify'],
+                Name: config.name,
+                Password: config.password,
+                ServerAddress: config.server,
+                ServerName: config.sni,
+                ServerPort: config.port,
+                SupportUDP: config.udp,
+                Type: 'trojan',
             }
             return proxy
         } else {
