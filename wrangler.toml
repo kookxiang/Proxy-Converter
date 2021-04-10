@@ -1,0 +1,6 @@
+name = "clash-converter"
+type = "webpack"
+zone_id = ""
+account_id = "78a4b2ae692c07291f6525057b96b874"
+workers_dev = true
+webpack_config = "webpack.config.js"

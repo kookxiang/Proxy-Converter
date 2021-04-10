@@ -1,8 +1,21 @@
 {
     "compilerOptions": {
-        "declaration": false,
-        "module": "esnext",
-        "moduleResolution": "node"
+        "esModuleInterop": true,
+        "lib": [
+            "esnext",
+            "webworker"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "target": "es2016",
+        "types": [
+            "@cloudflare/workers-types"
+        ]
     },
-    "extends": "@tsconfig/node12/tsconfig.json"
+    "include": [
+        "src",
+        "node_modules/@cloudflare/workers-types/index.d.ts"
+    ],
 }

@@ -1,10 +1,10 @@
 # Proxy Converter
 
-![Deploy to FC](https://github.com/kookxiang/Proxy-Converter/workflows/Deploy%20to%20FC/badge.svg?branch=master)
+![Deploy](https://github.com/kookxiang/Proxy-Converter/workflows/Deploy/badge.svg?branch=master)
 
 > 某不知名的订阅转换工具
 >
-> 服务地址: http://fc.kookxiang.com/utils/converter
+> 服务地址: https://clash-converter.kookxiang.workers.dev
 >
 > 使用方法：用新链接替换原有订阅链接
 
@@ -17,7 +17,7 @@
 注：拼接参数时需要对特殊字符进行 URL Encode，最终链接如:
 
 ```
-https://fc.kookxiang.com/utils/converter?url=https%3A%2F%2Fexample.com%2Fclash%3Fquery&from=clash&to=clash
+https://clash-converter.kookxiang.workers.dev/?url=https%3A%2F%2Fexample.com%2Fclash%3Fquery&from=clash&to=clash
 ```
 
 ## 高级参数

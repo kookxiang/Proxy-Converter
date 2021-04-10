@@ -1,18 +1,18 @@
-import { unescape } from "querystring"
-import { URL, URLSearchParams } from "url"
 import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, VmessProxyServer } from "../ProxyServer"
+import { decode } from 'js-base64';
 
 export default function GetProxyListFromBase64(content: string): ProxyServer[] {
-    const data = Buffer.from(content, 'base64').toString().split('\n')
+    const data = decode(content).split('\n')
     if (!data?.length) {
         throw new Error('cannot find proxy list.')
     }
-    return data.filter(Boolean).map((line: string) => {
-        const url = new URL(line.trim())
+    return data.map(x => x.trim()).filter(Boolean).map((line: string) => {
+        if (line.startsWith('vmess://')) {
+            return GetProxyFromVmessURL(line.replace('vmess://', ''))
+        }
+        const url = new URL(line)
         const protocol = url.protocol.replace(/:$/, '')
-        if (protocol === 'vmess') {
-            return GetProxyFromVmessURL(url)
-        } else if (protocol === 'ss') {
+        if (protocol === 'ss') {
             return GetProxyFromShadowsocksURL(url)
         } else if (protocol === 'ssr') {
             return GetProxyFromShadowsocksRURL(url)
@@ -22,8 +22,8 @@ export default function GetProxyListFromBase64(content: string): ProxyServer[] {
     })
 }
 
-function GetProxyFromVmessURL(url: URL): VmessProxyServer {
-    const config = JSON.parse(Buffer.from(url.host, 'base64').toString())
+function GetProxyFromVmessURL(data: string): VmessProxyServer {
+    const config = JSON.parse(decode(data))
     if (+config.v !== 2) {
         throw new Error(`unsupported vmess version: ${config.v}`)
     }
@@ -52,7 +52,7 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
     if (url.username && url.password) {
         const result: ShadowsocksProxyServer = {
             Cipher: url.username,
-            Name: unescape(url.hash?.replace(/^#/, '')) || url.host,
+            Name: decodeURIComponent(url.hash?.replace(/^#/, '')) || url.host,
             Password: url.password,
             ServerAddress: url.hostname,
             ServerPort: +url.port,
@@ -60,17 +60,17 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
         }
         return result
     } if (url.username) {
-        [url.username, url.password] = Buffer.from(url.username, 'base64').toString().split(':')
+        [url.username, url.password] = decode(url.username).split(':')
         return GetProxyFromShadowsocksURL(url)
     } else {
-        const decoded = Buffer.from(url.host, 'base64').toString()
+        const decoded = decode(url.host)
         if (decoded.match(/:/g)?.length === 5) {
             return GetProxyFromShadowsocksRURL(url)
         }
         const raw = new URL(`ss://${decoded}`)
         const result: ShadowsocksProxyServer = {
             Cipher: raw.username,
-            Name: unescape(url.hash?.replace(/^#/, '')) || url.host,
+            Name: decodeURIComponent(url.hash?.replace(/^#/, '')) || url.host,
             Password: raw.password,
             ServerAddress: raw.hostname,
             ServerPort: +raw.port,
@@ -81,15 +81,14 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
 }
 
 function GetProxyFromShadowsocksRURL(url: URL): ShadowsocksRProxyServer {
-    const decoded = Buffer.from(url.host, 'base64').toString()
-    const [prefix, suffix] = decoded.split('/')
+    const [prefix, suffix] = decode(url.host).split('/')
     const [host, port, protocol, method, obfs, password] = prefix.split(':')
     const params = new URLSearchParams(suffix)
     const result: ShadowsocksRProxyServer = {
         Cipher: method,
         Name: params.get('remarks') ?? `${host}:${port}`,
         Obfs: obfs,
-        Password: Buffer.from(password, 'base64').toString(),
+        Password: decode(password),
         Protocol: protocol,
         ServerAddress: host,
         ServerPort: +port,
