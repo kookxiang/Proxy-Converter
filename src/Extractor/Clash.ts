@@ -13,7 +13,7 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
         }
     }
     if (!dataList.length) {
-        throw new Error('cannot find proxy list.')
+        throw new Error('cannot find proxy list.\n\nData:\n' + content)
     }
     return dataList.map((config: any) => {
         if (config.type === 'vmess') {

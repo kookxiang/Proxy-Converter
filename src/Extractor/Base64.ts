@@ -4,7 +4,7 @@ import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanPro
 export default function GetProxyListFromBase64(content: string): ProxyServer[] {
     const data = decode(content).split('\n')
     if (!data?.length) {
-        throw new Error('cannot find proxy list.')
+        throw new Error('cannot find proxy list.\n\nData:\n' + content)
     }
     return data.map(x => x.trim()).filter(Boolean).map((line: string) => {
         if (line.startsWith('vmess://')) {
