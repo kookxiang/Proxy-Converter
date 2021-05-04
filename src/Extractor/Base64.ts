@@ -1,10 +1,11 @@
 import { decode } from 'js-base64';
+import { ConvertError } from '../Error';
 import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from "../ProxyServer";
 
 export default function GetProxyListFromBase64(content: string): ProxyServer[] {
     const data = decode(content).split('\n')
     if (!data?.length) {
-        throw new Error('cannot find proxy list.\n\nData:\n' + content)
+        throw new ConvertError('cannot find proxy list.').WithSource('base64').WithContent(content)
     }
     return data.map(x => x.trim()).filter(Boolean).map((line: string) => {
         if (line.startsWith('vmess://')) {
@@ -19,7 +20,7 @@ export default function GetProxyListFromBase64(content: string): ProxyServer[] {
         } else if (protocol === 'trojan') {
             return GetProxyFromTrojanURL(url)
         } else {
-            throw new Error(`unsupported protocol: ${protocol}`)
+            throw new ConvertError(`unsupported protocol: ${protocol}`).WithSource('base64').WithData(line)
         }
     })
 }
@@ -27,7 +28,7 @@ export default function GetProxyListFromBase64(content: string): ProxyServer[] {
 function GetProxyFromVmessURL(data: string): VmessProxyServer {
     const config = JSON.parse(decode(data))
     if (+config.v !== 2) {
-        throw new Error(`unsupported vmess version: ${config.v}`)
+        throw new ConvertError(`unsupported vmess version: ${config.v}`).WithSource('base64').WithData(data)
     }
     const result: VmessProxyServer = {
         Cipher: config.type || 'auto',

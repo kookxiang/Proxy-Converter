@@ -1,4 +1,5 @@
 import YAML from 'yaml'
+import { ConvertError } from '../Error'
 import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from "../ProxyServer"
 
 const PossibleKeys = ['proxies', 'Proxies', 'proxy', 'Proxy']
@@ -13,7 +14,7 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
         }
     }
     if (!dataList.length) {
-        throw new Error('cannot find proxy list.\n\nData:\n' + content)
+        throw new ConvertError('cannot find proxy list').WithSource('clash').WithContent(content)
     }
     return dataList.map((config: any) => {
         if (config.type === 'vmess') {
@@ -74,7 +75,7 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
             }
             return proxy
         } else {
-            throw new Error(`unknown type: ${config.type}`)
+            throw new ConvertError(`unknown type: ${config.type}`).WithSource('clash').WithData(config)
         }
     })
 }

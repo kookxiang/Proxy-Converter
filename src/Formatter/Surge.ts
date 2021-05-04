@@ -1,3 +1,4 @@
+import { ConvertError } from '../Error'
 import { ProxyServer, ShadowsocksProxyServer, TrojanProxyServer, VmessProxyServer } from '../ProxyServer'
 
 export default function FormatProxyForSurge(ProxyList: ProxyServer[]): string {
@@ -45,7 +46,7 @@ export default function FormatProxyForSurge(ProxyList: ProxyServer[]): string {
                 row.push(`sni=${proxy.ServerName}`)
             }
         } else {
-            throw new Error(`unknown type: ${proxy.Type}`)
+            throw new ConvertError(`unknown type: ${proxy.Type}`).WithTarget('surge').WithData(proxy)
         }
         result.push(row.join(', '))
     }

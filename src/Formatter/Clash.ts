@@ -1,4 +1,5 @@
 import YAML from 'yaml'
+import { ConvertError } from '../Error'
 import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from '../ProxyServer'
 
 export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
@@ -72,7 +73,7 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
                 config['skip-cert-verify'] = proxy.SupportUDP
             }
         } else {
-            throw new Error(`unknown type: ${rawProxy.Type}`)
+            throw new ConvertError(`unknown type: ${rawProxy.Type}`).WithTarget('clash').WithData(rawProxy)
         }
         proxies.push(config)
     }
