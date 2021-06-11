@@ -109,9 +109,9 @@ function GetProxyFromShadowsocksRURL(url: URL): ShadowsocksRProxyServer {
 function GetProxyFromTrojanURL(url: URL): TrojanProxyServer {
     const name = decodeURIComponent(url.hash ?? '').replace(/^#/, '');
     return {
-        Name: name || `${url.host}:${url.port}`,
+        Name: name || url.host,
         Password: url.username,
-        ServerAddress: url.host,
+        ServerAddress: url.hostname,
         ServerPort: Number(url.port),
         Type: 'trojan',
     };
