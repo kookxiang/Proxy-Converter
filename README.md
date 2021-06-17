@@ -41,3 +41,11 @@ https://kookxiang.dev/proxy/convert/?url=https%3A%2F%2Fexample.com%2Fclash%3Fque
 ```
 ...&filter=HK&filter=TW
 ```
+
+### resolve
+
+云端执行 DNS 解析，用于应对极端情况下 DNS 污染导致的不可用
+
+```
+...&resolve
+```

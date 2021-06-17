@@ -2,6 +2,7 @@ import GetProxyListFromBase64 from './Extractor/Base64'
 import GetProxyListFromClash from './Extractor/Clash'
 import FormatProxyForClash from './Formatter/Clash'
 import FormatProxyForSurge from './Formatter/Surge'
+import { ResolveDNSForProxy } from './Processer/dns'
 import { ProxyServer } from './ProxyServer'
 
 export async function handleRequest(request: Request): Promise<Response> {
@@ -13,6 +14,7 @@ export async function handleRequest(request: Request): Promise<Response> {
     }
 
     let data: string
+    const headers = new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
 
     try {
         data = await fetch(url, { redirect: 'follow' }).then(response => response.text())
@@ -44,8 +46,12 @@ export async function handleRequest(request: Request): Promise<Response> {
         }
         proxies.sort((a, b) => a.Name.localeCompare(b.Name))
 
+        if (query.has('resolve')) {
+            headers.set('X-DNS-Resolver', 'enabled')
+            await Promise.all(proxies.map(ResolveDNSForProxy))
+        }
+
         // output
-        const headers = new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
         switch (query.get('to') ?? 'clash') {
             case 'clash':
                 return new Response(FormatProxyForClash(proxies), { headers })
