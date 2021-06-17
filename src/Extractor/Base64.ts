@@ -112,6 +112,7 @@ function GetProxyFromTrojanURL(url: URL): TrojanProxyServer {
         Name: name || url.host,
         Password: url.username,
         ServerAddress: url.hostname,
+        ServerName: url.searchParams.get('sni') ?? url.searchParams.get('peer'),
         ServerPort: Number(url.port),
         Type: 'trojan',
     };
