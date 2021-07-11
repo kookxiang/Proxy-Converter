@@ -42,8 +42,8 @@ function GetProxyFromVmessURL(data: string): VmessProxyServer {
         TransportSecurity: config.tls ? 'tls' : 'none',
         Type: "vmess",
     }
-    if (result.Transport === 'ws' && 'ws-path' in config) {
-        result.WebSocketPath = config['ws-path'] || '/'
+    if (result.Transport === 'ws') {
+        result.WebSocketPath = config['ws-path'] || config['path'] || '/'
     }
     if (result.Transport === 'ws' && config.host) {
         result.WebSocketHost = config.host
