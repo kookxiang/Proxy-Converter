@@ -5,8 +5,11 @@ import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanPro
 const PossibleKeys = ['proxies', 'Proxies', 'proxy', 'Proxy']
 
 export default function GetProxyListFromClash(content: string): ProxyServer[] {
-    content = content.split('\n').map(x => x.trim()).filter(x => x.match(/^\s*#/)).join('\n')
+    content = content.split('\n').filter(x => !x.match(/^\s*#/)).join('\n')
     const data = YAML.parse(content, { prettyErrors: true })
+    if (!data) {
+        throw new ConvertError('parse yaml failed').WithSource('clash').WithContent(content)
+    }
     let dataList = []
     for (const key of PossibleKeys) {
         if (Array.isArray(data[key])) {

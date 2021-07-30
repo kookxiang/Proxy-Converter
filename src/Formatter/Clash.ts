@@ -38,7 +38,9 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
             config.port = proxy.ServerPort
             config.cipher = proxy.Cipher
             config.password = proxy.Password
-            config.udp = proxy.SupportUDP
+            if (proxy.SupportUDP) {
+                config.udp = true
+            }
         } else if (rawProxy.Type === 'ssr') {
             let proxy = rawProxy as ShadowsocksRProxyServer
             config.cipher = proxy.Cipher
@@ -55,7 +57,9 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
             }
             config.server = proxy.ServerAddress
             config.type = 'ssr'
-            config.udp = proxy.SupportUDP
+            if (proxy.SupportUDP) {
+                config.udp = true
+            }
         } else if (rawProxy.Type === 'trojan') {
             let proxy = rawProxy as TrojanProxyServer
             config.name = proxy.Name

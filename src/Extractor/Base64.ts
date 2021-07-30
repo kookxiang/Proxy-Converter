@@ -1,9 +1,9 @@
-import { decode } from 'js-base64';
-import { ConvertError } from '../Error';
-import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from "../ProxyServer";
+import * as Base64 from 'js-base64'
+import { ConvertError } from '../Error'
+import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from "../ProxyServer"
 
 export default function GetProxyListFromBase64(content: string): ProxyServer[] {
-    const data = decode(content).split('\n')
+    const data = Base64.decode(content).split('\n')
     if (!data?.length) {
         throw new ConvertError('cannot find proxy list.').WithSource('base64').WithContent(content)
     }
@@ -12,11 +12,11 @@ export default function GetProxyListFromBase64(content: string): ProxyServer[] {
             return GetProxyFromVmessURL(line.replace('vmess://', ''))
         }
         const url = new URL(line)
-        const protocol = url.protocol.replace(/:$/, '')
+        const protocol = line.split('://')[0]
         if (protocol === 'ss') {
-            return GetProxyFromShadowsocksURL(url)
+            return GetProxyFromShadowsocksURL(line.replace('ss://', ''))
         } else if (protocol === 'ssr') {
-            return GetProxyFromShadowsocksRURL(url)
+            return GetProxyFromShadowsocksRURL(line.replace('ssr://', ''))
         } else if (protocol === 'trojan') {
             return GetProxyFromTrojanURL(url)
         } else {
@@ -26,7 +26,7 @@ export default function GetProxyListFromBase64(content: string): ProxyServer[] {
 }
 
 function GetProxyFromVmessURL(data: string): VmessProxyServer {
-    const config = JSON.parse(decode(data))
+    const config = JSON.parse(Base64.decode(data))
     if (+config.v !== 2) {
         throw new ConvertError(`unsupported vmess version: ${config.v}`).WithSource('base64').WithData(data)
     }
@@ -51,7 +51,8 @@ function GetProxyFromVmessURL(data: string): VmessProxyServer {
     return result
 }
 
-function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
+function GetProxyFromShadowsocksURL(data: string): ShadowsocksProxyServer {
+    const url = new URL(`ss://${data}`)
     if (url.username && url.password) {
         const result: ShadowsocksProxyServer = {
             Cipher: url.username,
@@ -63,51 +64,42 @@ function GetProxyFromShadowsocksURL(url: URL): ShadowsocksProxyServer {
         }
         return result
     } if (url.username) {
-        [url.username, url.password] = decode(url.username).split(':')
-        return GetProxyFromShadowsocksURL(url)
+        return GetProxyFromShadowsocksURL(data.replace(url.username, Base64.decode(url.username)))
     } else {
-        const decoded = decode(url.host)
+        const decoded = Base64.decode(data)
         if (decoded.match(/:/g)?.length === 5) {
-            return GetProxyFromShadowsocksRURL(url)
+            return GetProxyFromShadowsocksRURL(decoded)
         }
-        const raw = new URL(`ss://${decoded}`)
-        const result: ShadowsocksProxyServer = {
-            Cipher: raw.username,
-            Name: decodeURIComponent(url.hash?.replace(/^#/, '')) || url.host,
-            Password: raw.password,
-            ServerAddress: raw.hostname,
-            ServerPort: +raw.port,
-            Type: 'ss',
-        }
-        return result
+        return GetProxyFromShadowsocksURL(`ss://${decoded}`)
     }
 }
 
-function GetProxyFromShadowsocksRURL(url: URL): ShadowsocksRProxyServer {
-    const [prefix, suffix] = decode(url.host).split('/')
-    const [host, port, protocol, method, obfs, password] = prefix.split(':')
+function GetProxyFromShadowsocksRURL(base64Data: string): ShadowsocksRProxyServer {
+    const [prefix, suffix] = Base64.decode(base64Data).split('/')
+    const [password, obfs, method, protocol, port, ...others] = prefix.split(':').reverse()
+    const host = others.reverse().join(':')
     const params = new URLSearchParams(suffix)
     const result: ShadowsocksRProxyServer = {
         Cipher: method,
-        Name: params.get('remarks') ?? `${host}:${port}`,
+        Name: params.get('remarks') ? Base64.decode(params.get('remarks')) : `${host}:${port}`,
         Obfs: obfs,
-        Password: decode(password),
+        Password: Base64.decode(password),
         Protocol: protocol,
         ServerAddress: host,
         ServerPort: +port,
         Type: 'ssr',
     }
     if (params.has('obfsparam')) {
-        result.ObfsParams = params.get('obfsparam') as string
+        result.ObfsParams = autoDecodeBase64(params.get('obfsparam'))
     }
     if (params.has('protoparam')) {
-        result.ProtocolParams = params.get('protoparam') as string
+        result.ProtocolParams = autoDecodeBase64(params.get('protoparam'))
     }
     return result
 }
 
 function GetProxyFromTrojanURL(url: URL): TrojanProxyServer {
-    const name = decodeURIComponent(url.hash ?? '').replace(/^#/, '');
+    const name = decodeURIComponent(url.hash ?? '').replace(/^#/, '')
     return {
         Name: name || url.host,
         Password: url.username,
@@ -115,5 +107,16 @@ function GetProxyFromTrojanURL(url: URL): TrojanProxyServer {
         ServerName: url.searchParams.get('sni') ?? url.searchParams.get('peer'),
         ServerPort: Number(url.port),
         Type: 'trojan',
-    };
+    }
+}
+
+function autoDecodeBase64(source: string) {
+    if (source.match(/^[A-Za-z0-9+/=]+$/)) {
+        try {
+            return Base64.decode(source)
+        } catch (e) {
+            // ignored
+        }
+    }
+    return source
 }
