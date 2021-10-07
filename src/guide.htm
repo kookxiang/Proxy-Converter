@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy-Converter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css" referrerpolicy="no-referrer" />
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+        }
+
+        .left,
+        .right {
+            width: 50%;
+        }
+
+        .left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .left form {
+            flex: 1;
+            padding: 24px;
+            overflow: auto;
+        }
+
+        .left .actions {
+            padding: 16px 24px;
+            box-shadow: 0 12px 16px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .right {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            box-shadow: 0 0 16px -4px rgba(0, 0, 0, 0.5);
+            z-index: 5;
+        }
+
+        .right .address-bar {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            line-height: 24px;
+        }
+
+        .right .address-bar button {
+            background: #fff;
+            padding: 0 16px;
+            border: 0;
+            border-right: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .right .address-bar .url {
+            flex: 1;
+            min-height: 24px;
+            padding: 8px 16px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            user-select: all;
+        }
+
+        .right iframe {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="left">
+        <form>
+            <div class="field">
+                <label class="label">需要转换的订阅链接</label>
+                <div class="control">
+                    <input class="input" type="url" name="url" required placeholder="URL">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">链接类型</label>
+                <div class="control">
+                    <label class="radio">
+                        <input type="radio" name="from" checked value="clash">
+                        clash 订阅链接 (yaml)
+                    </label>
+                </div>
+                <div class="control">
+                    <label class="radio">
+                        <input type="radio" name="from" value="base64">
+                        ss / trojan / vmess 订阅链接 (base64)
+                    </label>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">排除节点</label>
+                <div class="control">
+                    <textarea class="textarea" name="exempt" placeholder="排除包含关键字的节点，一行一个"></textarea>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">包含节点</label>
+                <div class="control">
+                    <textarea class="textarea" name="filter" placeholder="只返回包含关键字的节点，一行一个"></textarea>
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <label class="checkbox">
+                        <input type="checkbox" name="resolve">
+                        云端执行 DNS 解析
+                    </label>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">链接类型</label>
+                <div class="control">
+                    <label class="radio">
+                        <input type="radio" name="to" checked value="clash">
+                        clash 订阅链接
+                    </label>
+                </div>
+                <div class="control">
+                    <label class="radio">
+                        <input type="radio" name="to" value="surge">
+                        surge 订阅链接
+                    </label>
+                </div>
+            </div>
+        </form>
+        <div class="field is-grouped actions">
+            <div class="control">
+                <button class="button is-link" onclick="generateUrl()">生成订阅链接</button>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div class="address-bar">
+            <button onclick="copyUrl()">COPY</button>
+            <div class="url">&nbsp;</div>
+        </div>
+        <iframe frameborder="0" class="content"></iframe>
+    </div>
+
+    <script>
+        function copyUrl() {
+            const el = document.querySelector('.address-bar .url');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(el.textContent)
+                    .catch(function () {
+                        debugger
+                        el.focus();
+                        el.select();
+                        document.execCommand('copy');
+                    })
+            } else {
+                el.focus();
+                el.select();
+                document.execCommand('copy');
+            }
+        }
+
+        function generateUrl() {
+            let result = location.href.replace(/\?.*$/, '') + '?';
+            const url = document.querySelector('input[name=url]').value;
+            const from = document.querySelector('input[name=from]:checked').value;
+            const to = document.querySelector('input[name=to]:checked').value;
+            const resolve = document.querySelector('input[name=resolve]').checked;
+            if (!url) {
+                return;
+            }
+
+            result += 'url=' + encodeURIComponent(url);
+
+            if (from !== 'clash') {
+                result += '&from=' + encodeURIComponent(from);
+            }
+
+            if (to !== 'clash') {
+                result += '&to=' + encodeURIComponent(to);
+            }
+
+            if (resolve) {
+                result += '&resolve';
+            }
+
+            document.querySelector('textarea[name=filter]').value
+                .split('\n')
+                .map(function (text) { return text.trim() })
+                .filter(Boolean)
+                .forEach(function (keyword) {
+                    result += '&filter=' + encodeURIComponent(keyword);
+                });
+
+            document.querySelector('textarea[name=exempt]').value
+                .split('\n')
+                .map(function (text) { return text.trim() })
+                .filter(Boolean)
+                .forEach(function (keyword) {
+                    result += '&exempt=' + encodeURIComponent(keyword);
+                });
+
+            document.querySelector('.address-bar .url').textContent = result;
+            document.querySelector('iframe.content').src = result;
+        }
+
+        document.body.addEventListener('change', generateUrl, true);
+    </script>
+</body>
+
+</html>

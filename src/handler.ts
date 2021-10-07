@@ -2,6 +2,7 @@ import GetProxyListFromBase64 from './Extractor/Base64'
 import GetProxyListFromClash from './Extractor/Clash'
 import FormatProxyForClash from './Formatter/Clash'
 import FormatProxyForSurge from './Formatter/Surge'
+import { Guide } from './guide'
 import { ResolveDNSForProxy } from './Processer/dns'
 import { ProxyServer } from './ProxyServer'
 
@@ -10,7 +11,9 @@ export async function handleRequest(request: Request): Promise<Response> {
     const url = query.get('url');
 
     if (!url) {
-        return new Response('url is required', { status: 500 })
+        return new Response(Guide, {
+            headers: new Headers({ 'Content-Type': 'text/html; charset=utf-8' })
+        })
     }
 
     let data: string
