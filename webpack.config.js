@@ -19,6 +19,10 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.html?$/i,
+                loader: "html-loader",
+            },
+            {
                 test: /\.ts$/,
                 loader: 'ts-loader',
                 options: {

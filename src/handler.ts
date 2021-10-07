@@ -2,7 +2,7 @@ import GetProxyListFromBase64 from './Extractor/Base64'
 import GetProxyListFromClash from './Extractor/Clash'
 import FormatProxyForClash from './Formatter/Clash'
 import FormatProxyForSurge from './Formatter/Surge'
-import { Guide } from './guide'
+import Guide from './guide.htm'
 import { ResolveDNSForProxy } from './Processer/dns'
 import { ProxyServer } from './ProxyServer'
 
