@@ -8,11 +8,13 @@
 >
 > 使用方法：用新链接替换原有订阅链接
 
+使用向导: https://kookxiang.dev/proxy/convert
+
 ## 基本参数
 
  - `url`: 需要转换的订阅链接
  - `from`: 原始订阅链接格式，目前支持 `clash`（默认）/ `base64`
- - `to`: 需要转换成的格式，目前支持 `clash` / `surge`
+ - `to`: 需要转换成的格式，目前支持 `clash` / `surge` / `base64`
 
 注：拼接参数时需要对特殊字符进行 URL Encode，最终链接如:
 
