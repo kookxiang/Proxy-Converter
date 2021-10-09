@@ -1,5 +1,6 @@
 import GetProxyListFromBase64 from './Extractor/Base64'
 import GetProxyListFromClash from './Extractor/Clash'
+import FormatProxyToBase64 from './Formatter/Base64'
 import FormatProxyForClash from './Formatter/Clash'
 import FormatProxyForSurge from './Formatter/Surge'
 import Guide from './guide.htm'
@@ -56,6 +57,8 @@ export async function handleRequest(request: Request): Promise<Response> {
 
         // output
         switch (query.get('to') ?? 'clash') {
+            case 'base64':
+                return new Response(FormatProxyToBase64(proxies), { headers })
             case 'clash':
                 return new Response(FormatProxyForClash(proxies), { headers })
             case 'surge':
