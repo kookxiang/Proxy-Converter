@@ -66,11 +66,17 @@ function GetProxyFromShadowsocksURL(data: string): ShadowsocksProxyServer {
     } if (url.username) {
         return GetProxyFromShadowsocksURL(data.replace(url.username, Base64.decode(url.username)))
     } else {
-        const decoded = Base64.decode(data)
+        let decoded: string;
+        if (data.includes('#')) {
+            const [dataWithoutRemarks, remarks] = data.split('#')
+            decoded = `${Base64.decode(dataWithoutRemarks)}#${remarks}`
+        } else {
+            decoded = Base64.decode(data)
+        }
         if (decoded.match(/:/g)?.length === 5) {
             return GetProxyFromShadowsocksRURL(decoded)
         }
-        return GetProxyFromShadowsocksURL(`ss://${decoded}`)
+        return GetProxyFromShadowsocksURL(decoded)
     }
 }
 
