@@ -1,12 +1,11 @@
 import { ConvertError } from '../Error'
-import { ProxyServer, ShadowsocksProxyServer, TrojanProxyServer, VmessProxyServer } from '../ProxyServer'
+import { ProxyServer } from '../ProxyServer'
 
 export default function FormatProxyForSurge(ProxyList: ProxyServer[]): string {
     let result: string[] = []
     for (let proxy of ProxyList) {
         let row: string[] = []
         if (proxy.Type === 'vmess') {
-            proxy = proxy as VmessProxyServer
             row.push(`${proxy.Name} = vmess`)
             row.push(proxy.ServerAddress)
             row.push(`${proxy.ServerPort}`)
@@ -30,14 +29,12 @@ export default function FormatProxyForSurge(ProxyList: ProxyServer[]): string {
                 row.push(`ws-headers=host:${JSON.stringify(proxy.WebSocketHost)}`)
             }
         } else if (proxy.Type === 'ss') {
-            proxy = proxy as ShadowsocksProxyServer
             row.push(`${proxy.Name} = ss`)
             row.push(proxy.ServerAddress)
             row.push(`${proxy.ServerPort}`)
             row.push(`encrypt-method=${proxy.Cipher}`)
             row.push(`password=${proxy.Password}`)
         } else if (proxy.Type === 'trojan') {
-            proxy = proxy as TrojanProxyServer
             row.push(`${proxy.Name} = trojan`)
             row.push(proxy.ServerAddress)
             row.push(`${proxy.ServerPort}`)

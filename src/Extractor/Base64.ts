@@ -51,7 +51,7 @@ function GetProxyFromVmessURL(data: string): VmessProxyServer {
     return result
 }
 
-function GetProxyFromShadowsocksURL(data: string): ShadowsocksProxyServer {
+function GetProxyFromShadowsocksURL(data: string): ShadowsocksProxyServer | ShadowsocksRProxyServer {
     const url = new URL(`ss://${data}`)
     if (url.username && url.password) {
         const result: ShadowsocksProxyServer = {
