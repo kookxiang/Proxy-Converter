@@ -1,9 +1,10 @@
 interface CommonConfig {
     Name: string,
-    Type: 'vmess' | 'ss' | 'ssr' | 'trojan',
+    Type: string,
 }
 
 export interface VmessProxyServer extends CommonConfig {
+    Type: 'vmess',
     ClientID: string,
     ClientAlterID: number,
 
@@ -25,6 +26,7 @@ export interface VmessProxyServer extends CommonConfig {
 }
 
 export interface ShadowsocksProxyServer extends CommonConfig {
+    Type: 'ss',
     ServerAddress: string,
     ServerPort: number,
     Password: string,
@@ -33,7 +35,8 @@ export interface ShadowsocksProxyServer extends CommonConfig {
     Timeout?: number,
 }
 
-export interface ShadowsocksRProxyServer extends ShadowsocksProxyServer {
+export interface ShadowsocksRProxyServer extends Omit<ShadowsocksProxyServer, 'Type'> {
+    Type: 'ssr',
     Protocol: string,
     ProtocolParams?: string,
     Obfs: string,
@@ -41,6 +44,7 @@ export interface ShadowsocksRProxyServer extends ShadowsocksProxyServer {
 }
 
 export interface TrojanProxyServer extends CommonConfig {
+    Type: 'trojan',
     AllowInsecure?: boolean;
     Password: string,
     ServerAddress: string,

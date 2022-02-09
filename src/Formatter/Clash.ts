@@ -1,13 +1,13 @@
 import YAML from 'yaml'
 import { ConvertError } from '../Error'
-import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from '../ProxyServer'
+import { ProxyServer } from '../ProxyServer'
 
 export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
     const proxies: any[] = []
     for (let rawProxy of ProxyList) {
         const config: any = {}
         if (rawProxy.Type === 'vmess') {
-            let proxy = rawProxy as VmessProxyServer
+            let proxy = rawProxy
             config.name = proxy.Name
             config.type = 'vmess'
             config.server = proxy.ServerAddress
@@ -31,7 +31,7 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
                 config['ws-headers'] = { Host: proxy.WebSocketHost }
             }
         } else if (rawProxy.Type === 'ss') {
-            let proxy = rawProxy as ShadowsocksProxyServer
+            let proxy = rawProxy
             config.name = proxy.Name
             config.type = 'ss'
             config.server = proxy.ServerAddress
@@ -42,7 +42,7 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
                 config.udp = true
             }
         } else if (rawProxy.Type === 'ssr') {
-            let proxy = rawProxy as ShadowsocksRProxyServer
+            let proxy = rawProxy
             config.cipher = proxy.Cipher
             config.name = proxy.Name
             config.obfs = proxy.Obfs
@@ -61,7 +61,7 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
                 config.udp = true
             }
         } else if (rawProxy.Type === 'trojan') {
-            let proxy = rawProxy as TrojanProxyServer
+            let proxy = rawProxy
             config.name = proxy.Name
             config.password = proxy.Password
             config.port = proxy.ServerPort
@@ -77,7 +77,7 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
                 config['skip-cert-verify'] = proxy.SupportUDP
             }
         } else {
-            throw new ConvertError(`unknown type: ${rawProxy.Type}`).WithTarget('clash').WithData(rawProxy)
+            throw new ConvertError(`unknown type: ${(rawProxy as any)?.Type}`).WithTarget('clash').WithData(rawProxy)
         }
         proxies.push(config)
     }

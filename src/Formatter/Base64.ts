@@ -1,13 +1,13 @@
 import * as Base64 from 'js-base64'
 import { ConvertError } from '../Error'
-import { ProxyServer, ShadowsocksProxyServer, ShadowsocksRProxyServer, TrojanProxyServer, VmessProxyServer } from '../ProxyServer'
+import { ProxyServer } from '../ProxyServer'
 
 export default function FormatProxyToBase64(ProxyList: ProxyServer[]): string {
     const proxies: string[] = []
     for (let rawProxy of ProxyList) {
         let url = new URL(`${rawProxy.Type}://${rawProxy.ServerAddress}:${rawProxy.ServerPort}`)
         if (rawProxy.Type === 'vmess') {
-            let proxy = rawProxy as VmessProxyServer
+            let proxy = rawProxy
             const config: any = {}
             config.add = proxy.ServerAddress
             config.port = proxy.ServerPort
@@ -31,12 +31,12 @@ export default function FormatProxyToBase64(ProxyList: ProxyServer[]): string {
             proxies.push(`vmess://${Base64.encode(JSON.stringify(config))}`)
             continue
         } else if (rawProxy.Type === 'ss') {
-            let proxy = rawProxy as ShadowsocksProxyServer
+            let proxy = rawProxy
             url.username = proxy.Cipher
             url.password = proxy.Password
             url.hash = `#${proxy.Name}`
         } else if (rawProxy.Type === 'ssr') {
-            let proxy = rawProxy as ShadowsocksRProxyServer
+            let proxy = rawProxy
             const config = [
                 proxy.ServerAddress,
                 proxy.ServerPort,
@@ -56,14 +56,14 @@ export default function FormatProxyToBase64(ProxyList: ProxyServer[]): string {
             proxies.push(`vmess://${Base64.encode(`${config.join(':')}/?${params.toString()}`)}`)
             continue
         } else if (rawProxy.Type === 'trojan') {
-            let proxy = rawProxy as TrojanProxyServer
+            let proxy = rawProxy
             url.username = proxy.Password
             url.hash = `#${proxy.Name}`
             if (proxy.ServerName) {
                 url.searchParams.set('sni', proxy.ServerName)
             }
         } else {
-            throw new ConvertError(`unknown type: ${rawProxy.Type}`).WithTarget('base64').WithData(rawProxy)
+            throw new ConvertError(`unknown type: ${(rawProxy as any)?.Type}`).WithTarget('base64').WithData(rawProxy)
         }
         proxies.push(url.toString())
     }
