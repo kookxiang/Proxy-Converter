@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require("webpack")
 
 module.exports = {
     bail: true,
@@ -31,4 +32,9 @@ module.exports = {
             },
         ],
     },
+    plugins: [
+        new webpack.ProvidePlugin({
+            URL: ['whatwg-url', 'URL'],
+        }),
+    ],
 }

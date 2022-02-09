@@ -2,6 +2,7 @@
   "author": "kookxiang",
   "dependencies": {
     "js-base64": "^3.6.0",
+    "whatwg-url": "^11.0.0",
     "yaml": "^1.10.0"
   },
   "devDependencies": {
