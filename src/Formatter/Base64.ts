@@ -62,6 +62,9 @@ export default function FormatProxyToBase64(ProxyList: ProxyServer[]): string {
             if (proxy.ServerName) {
                 url.searchParams.set('sni', proxy.ServerName)
             }
+            if (proxy.AllowInsecure) {
+                url.searchParams.set('allowInsecure', proxy.AllowInsecure.toString())
+            }
         } else {
             throw new ConvertError(`unknown type: ${(rawProxy as any)?.Type}`).WithTarget('base64').WithData(rawProxy)
         }

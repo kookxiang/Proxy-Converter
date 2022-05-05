@@ -49,6 +49,7 @@ export default function GetProxyListFromClash(content: string): ProxyServer[] {
                 ServerAddress: config.server,
                 ServerPort: config.port,
                 Type: 'ss',
+                SupportUDP: config.udp,
             }
             return proxy
         } else if (config.type === 'ssr') {

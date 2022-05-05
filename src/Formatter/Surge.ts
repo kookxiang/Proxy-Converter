@@ -34,6 +34,9 @@ export default function FormatProxyForSurge(ProxyList: ProxyServer[]): string {
             row.push(`${proxy.ServerPort}`)
             row.push(`encrypt-method=${proxy.Cipher}`)
             row.push(`password=${proxy.Password}`)
+            if (proxy.SupportUDP) {
+                row.push(`udp-relay=true`)
+            }
         } else if (proxy.Type === 'trojan') {
             row.push(`${proxy.Name} = trojan`)
             row.push(proxy.ServerAddress)
@@ -41,6 +44,9 @@ export default function FormatProxyForSurge(ProxyList: ProxyServer[]): string {
             row.push(`password=${proxy.Password}`)
             if (proxy.ServerName) {
                 row.push(`sni=${proxy.ServerName}`)
+            }
+            if (proxy.AllowInsecure) {
+                row.push(`skip-cert-verify=${proxy.AllowInsecure}`)
             }
         } else {
             throw new ConvertError(`unknown type: ${proxy.Type}`).WithTarget('surge').WithData(proxy)

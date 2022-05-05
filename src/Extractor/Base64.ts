@@ -60,6 +60,7 @@ function GetProxyFromShadowsocksURL(data: string): ShadowsocksProxyServer | Shad
             Password: url.password,
             ServerAddress: url.hostname,
             ServerPort: +url.port,
+            SupportUDP: true,
             Type: 'ss',
         }
         return result
@@ -93,6 +94,7 @@ function GetProxyFromShadowsocksRURL(base64Data: string): ShadowsocksRProxyServe
         Protocol: protocol,
         ServerAddress: host,
         ServerPort: +port,
+        SupportUDP: true,
         Type: 'ssr',
     }
     if (params.has('obfsparam')) {
@@ -106,6 +108,7 @@ function GetProxyFromShadowsocksRURL(base64Data: string): ShadowsocksRProxyServe
 
 function GetProxyFromTrojanURL(url: URL): TrojanProxyServer {
     const name = decodeURIComponent(url.hash ?? '').replace(/^#/, '')
+    const allowInsecure = url.searchParams.get('allowInsecure')
     return {
         Name: name || url.host,
         Password: url.username,
@@ -113,6 +116,7 @@ function GetProxyFromTrojanURL(url: URL): TrojanProxyServer {
         ServerName: url.searchParams.get('sni') ?? url.searchParams.get('peer'),
         ServerPort: Number(url.port),
         Type: 'trojan',
+        AllowInsecure: ['false', '0'].includes(allowInsecure) ? false : !!allowInsecure,
     }
 }
 

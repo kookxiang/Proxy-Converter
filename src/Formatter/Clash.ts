@@ -74,7 +74,7 @@ export default function FormatProxyForClash(ProxyList: ProxyServer[]): string {
                 config.sni = proxy.ServerName
             }
             if (proxy.AllowInsecure) {
-                config['skip-cert-verify'] = proxy.SupportUDP
+                config['skip-cert-verify'] = proxy.AllowInsecure
             }
         } else {
             throw new ConvertError(`unknown type: ${(rawProxy as any)?.Type}`).WithTarget('clash').WithData(rawProxy)
